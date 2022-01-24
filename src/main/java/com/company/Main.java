@@ -53,19 +53,19 @@ public class Main {
             totalPossibilities = new HashMap<>();
         }
 
-        for (String validWord : ogState.possibleWords) {
-            if (!totalPossibilities.containsKey(validWord)) {
+        for (String guess : ogState.possibleWords) {
+            if (!totalPossibilities.containsKey(guess)) {
                 ArrayList<GameState> wordChildren = new ArrayList<>();
-                for (String possibleWord : ogState.possibleWords) {
-                    GameState child = new GameState(ogState, possibleWord, validWord);
+                for (String solution : ogState.possibleWords) {
+                    GameState child = new GameState(ogState, guess, solution);
                     wordChildren.add(child);
                 }
                 int totalPoss = 0;
                 for (GameState state : wordChildren) {
                     totalPoss += state.possibleWords.size();
                 }
-                totalPossibilities.put(validWord, totalPoss);
-                System.out.println(totalPossibilities.size() + " " + validWord + " " + totalPoss / ogState.possibleWords.size());
+                totalPossibilities.put(guess, totalPoss);
+                System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
 
                 if (ogState.possibleWords.size() == 2315) {
                     yaml = new Yaml();
