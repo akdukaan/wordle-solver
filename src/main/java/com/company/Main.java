@@ -76,7 +76,7 @@ public class Main {
         }
 
         // Print the sorted list
-        List<Map.Entry<String, Integer> > list =
+        List<Map.Entry<String, Integer>> list =
                 new LinkedList<>(totalPossibilities.entrySet());
         list.sort(Map.Entry.comparingByValue());
         System.out.println(list);
