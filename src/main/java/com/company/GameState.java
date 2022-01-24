@@ -44,8 +44,8 @@ public class GameState {
     @SuppressWarnings("unchecked")
     public GameState(GameState parent, String guess, String actual) {
         this.parent = parent;
-        this.lettersMin = (HashMap) parent.lettersMin.clone();
-        this.lettersMax = (HashMap) parent.lettersMax.clone();
+        this.lettersMin = (HashMap<Character, Integer>) parent.lettersMin.clone();
+        this.lettersMax = (HashMap<Character, Integer>) parent.lettersMax.clone();
         this.greenLetters = parent.greenLetters.clone();
         this.misplacedLetters = new ArrayList<>(Arrays.asList(
                 new HashSet<>(),
@@ -58,7 +58,7 @@ public class GameState {
                 misplacedLetters.get(i).add(c);
             }
         }
-        this.possibleWords = (HashSet) parent.possibleWords.clone();
+        this.possibleWords = (HashSet<String>) parent.possibleWords.clone();
 
         for (char c = 'a'; c <= 'z'; c++) {
             if (getOccurances(c, guess) > getOccurances(c, actual)) {
@@ -106,7 +106,7 @@ public class GameState {
 
     @SuppressWarnings("unchecked")
     public void narrowUsingYellowLetters() {
-        HashSet<String> newWords = (HashSet) possibleWords.clone();
+        HashSet<String> newWords = (HashSet<String>) possibleWords.clone();
         for (String word : newWords) {
             if (!hasMisplacedLetters(word)) {
                 newWords.add(word);
