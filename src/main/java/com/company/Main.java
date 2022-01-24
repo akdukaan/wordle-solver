@@ -24,7 +24,7 @@ public class Main {
 
         // this is how to tell the code that a certain letter is in a certain spot
         // this means that the 2nd letter is an i (subtract 1 from the place you mean to put it)
-        //ogState.greenLetters[1] = 'i';
+        // ogState.greenLetters[1] = 'i';
 
         // this is how to tell the code that there are a maximum of a certain letter in the word
         // this means that there are no r's in the word.
