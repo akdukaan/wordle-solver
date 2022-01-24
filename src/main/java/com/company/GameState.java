@@ -41,6 +41,7 @@ public class GameState {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public GameState(GameState parent, String guess, String actual) {
         this.parent = parent;
         this.lettersMin = (HashMap) parent.lettersMin.clone();
@@ -92,18 +93,22 @@ public class GameState {
                 (greenLetters[4] != word.charAt(4) && greenLetters[4] != 0));
     }
 
+    public boolean hasMisplacedLetters(String word) {
+        for (int slot = 0; slot < 5; slot++) {
+            for (char ch : misplacedLetters.get(slot)) {
+                if (word.charAt(slot) == ch) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
     public void narrowUsingYellowLetters() {
         HashSet<String> newWords = (HashSet) possibleWords.clone();
         for (String word : newWords) {
-            boolean keep = true;
-            for (int slot = 0; slot < 5; slot++) {
-                for (char ch : misplacedLetters.get(slot)) {
-                    if (word.charAt(slot) == ch) {
-                        keep = false;
-                    }
-                }
-            }
-            if (keep) {
+            if (!hasMisplacedLetters(word)) {
                 newWords.add(word);
             }
         }
