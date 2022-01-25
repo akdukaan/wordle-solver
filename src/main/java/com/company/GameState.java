@@ -5,7 +5,7 @@ import java.util.*;
 
 public class GameState {
     GameState parent;
-    HashSet<String> possibleWords = new HashSet<>();
+    HashSet<String> possibleWords;
     HashMap<Character, Integer> lettersMin;
     HashMap<Character, Integer> lettersMax;
     char[] greenLetters;
@@ -84,7 +84,8 @@ public class GameState {
 
 
     public void narrowUsingGreenLetters() {
-        possibleWords.removeIf(word -> (greenLetters[0] != word.charAt(0) && greenLetters[0] != 0) ||
+        possibleWords.removeIf(word ->
+                (greenLetters[0] != word.charAt(0) && greenLetters[0] != 0) ||
                 (greenLetters[1] != word.charAt(1) && greenLetters[1] != 0) ||
                 (greenLetters[2] != word.charAt(2) && greenLetters[2] != 0) ||
                 (greenLetters[3] != word.charAt(3) && greenLetters[3] != 0) ||
@@ -103,7 +104,6 @@ public class GameState {
     }
 
     public void narrowUsingYellowLetters() {
-        System.out.println(misplacedLetters);
         HashSet<String> newWords = new HashSet<>();
         for (String word : possibleWords) {
             if (!hasMisplacedLetters(word)) {
@@ -113,17 +113,20 @@ public class GameState {
         possibleWords = newWords;
     }
 
+    public boolean isWordWithinBounds(String word) {
+        for (char ch = 'a'; ch <= 'z'; ch++) {
+            int occurances = getOccurrences(ch, word);
+            if (occurances < lettersMin.get(ch) || occurances > lettersMax.get(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void narrowUsingLetterMinMax() {
         HashSet<String> newWords = new HashSet<>();
         for (String word : possibleWords) {
-            boolean shouldAddWord = true;
-            for (char ch = 'a'; ch <= 'z'; ch++) {
-                int occurances = getOccurrences(ch, word);
-                if (occurances < lettersMin.get(ch) || occurances > lettersMax.get(ch)) {
-                    shouldAddWord = false;
-                }
-            }
-            if (shouldAddWord) {
+            if (isWordWithinBounds(word)) {
                 newWords.add(word);
             }
         }

@@ -28,26 +28,14 @@ public class Main {
         // this is how to tell the code that there are a maximum of a certain letter in the word
         // this means that there are no r's in the word.
         // ogState.lettersMax.put('r', 0);
-        ogState.lettersMax.put('o', 0);
-        ogState.lettersMax.put('t', 0);
-        ogState.lettersMax.put('e', 0);
-        ogState.lettersMax.put('c', 0);
-        ogState.lettersMax.put('i', 0);
-        ogState.lettersMax.put('n', 0);
 
         // this is how to tell the code that there is a minimum of a certain letter in the word
         // this means that there are at least 1 t's in the word.
         // ogState.lettersMin.put('t', 1);
-        ogState.lettersMin.put('r', 1);
-        ogState.lettersMin.put('a', 1);
 
         // this is how to tell the code that you know that a certain letter doesn't belong in a certain spot
         // this means that f does not belong in the 4th spot.
         // ogState.misplacedLetters.get(3).add('f');
-        ogState.misplacedLetters.get(0).add('r');
-        ogState.misplacedLetters.get(2).add('a');
-        ogState.misplacedLetters.get(3).add('r');
-        ogState.misplacedLetters.get(1).add('a');
 
         // REMEMBER: You want to pick the output with the lowest value.
         // The number is proportional to the number of words you can expect to have left after guessing that word.
@@ -55,33 +43,28 @@ public class Main {
         ogState.recalculatePossibleWords();
 
         Map<String, Integer> totalPossibilities;
-        Yaml yaml;
+        Yaml yaml = new Yaml();
         if (ogState.possibleWords.size() == 2315) {
-            InputStream inputStream = new FileInputStream("src/main/java/com/company/verboseoutput.yml");
-            yaml = new Yaml();
+            InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
             totalPossibilities = yaml.load(inputStream);
         } else {
             totalPossibilities = new HashMap<>();
         }
 
         //String[] forceTest = new String[]{"soare"};
-        for (String guess : ogState.possibleWords) {
+        for (String guess : validWords) {
             if (!totalPossibilities.containsKey(guess)) {
-                ArrayList<GameState> wordChildren = new ArrayList<>();
+                int totalPoss = 0;
                 for (String solution : ogState.possibleWords) {
                     GameState child = new GameState(ogState, guess, solution);
-                    wordChildren.add(child);
+                    totalPoss += child.possibleWords.size();
                 }
-                int totalPoss = 0;
-                for (GameState state : wordChildren) {
-                    totalPoss += state.possibleWords.size();
-                }
+
                 totalPossibilities.put(guess, totalPoss);
                 System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
 
                 if (ogState.possibleWords.size() == 2315) {
-                    yaml = new Yaml();
-                    FileWriter writer = new FileWriter("src/main/java/com/company/verboseoutput.yml");
+                    FileWriter writer = new FileWriter("src/main/java/com/company/output.yml");
                     yaml.dump(totalPossibilities, writer);
                 }
             }
@@ -92,10 +75,8 @@ public class Main {
                 new LinkedList<>(totalPossibilities.entrySet());
         list.sort(Map.Entry.comparingByValue());
         DecimalFormat df = new DecimalFormat("0.0000");
-        int i = 0;
         for (Map.Entry<String, Integer> entry : list) {
-            i++;
-            System.out.println(entry.getKey() + " = " + df.format(entry.getValue()/ogState.possibleWords.size()));
+            System.out.println(entry.getKey() + " = " + df.format((0.0 + entry.getValue())/ogState.possibleWords.size()));
         }
     }
 
