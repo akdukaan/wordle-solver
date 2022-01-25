@@ -22,8 +22,8 @@ public class Main {
         GameState ogState = new GameState();
 
         // this is how to tell the code that a certain letter is in a certain spot
-        // this means that the 2nd letter is an i (subtract 1 from the place you mean to put it)
-        // ogState.greenLetters[1] = 'i';
+        // replace the 0s with the letter surrounded by apostrophes, so like 'a'
+        ogState.greenLetters = new char[]{0,0,0,0,0};
 
         // this is how to tell the code that there are a maximum of a certain letter in the word
         // this means that there are no r's in the word.
@@ -82,6 +82,9 @@ public class Main {
                 star = "*";
             }
             System.out.println(i++ + ". " + entry.getKey() + " = " + df.format((0.0 + entry.getValue())/ogState.possibleWords.size()) + star);
+        }
+        if (ogState.possibleWords.size() < 2315) {
+            System.out.println(ogState.possibleWords);
         }
     }
 
