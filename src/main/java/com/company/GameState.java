@@ -1,7 +1,5 @@
 package com.company;
 
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.*;
 import java.util.*;
 
@@ -12,9 +10,8 @@ public class GameState {
     HashMap<Character, Integer> lettersMax;
     char[] greenLetters;
     ArrayList<Set<Character>> misplacedLetters;
-    Set<GameState> children = new HashSet<>();
 
-    public GameState() throws IOException {
+    public GameState() {
         this.parent = null;
         this.greenLetters = new char[5];
         this.lettersMin = new HashMap<>();
@@ -40,51 +37,10 @@ public class GameState {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //populateChildren();
-    }
-
-    public void populateChildren() throws IOException {
-        Map<String, Integer> totalPossibilities;
-        Yaml yaml;
-        if (this.possibleWords.size() == 2315) {
-            InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
-            yaml = new Yaml();
-            totalPossibilities = yaml.load(inputStream);
-        } else {
-            totalPossibilities = new HashMap<>();
-        }
-
-        for (String validWord : this.possibleWords) {
-            if (!totalPossibilities.containsKey(validWord)) {
-                ArrayList<GameState> wordChildren = new ArrayList<>();
-                for (String possibleWord : this.possibleWords) {
-                    GameState child = new GameState(this, possibleWord, validWord);
-                    wordChildren.add(child);
-                }
-                int totalPoss = 0;
-                for (GameState state : wordChildren) {
-                    totalPoss += state.possibleWords.size();
-                }
-                totalPossibilities.put(validWord, totalPoss);
-                System.out.println(totalPossibilities.size() + " " + validWord + " " + totalPoss / this.possibleWords.size());
-
-                if (this.possibleWords.size() == 2315) {
-                    yaml = new Yaml();
-                    FileWriter writer = new FileWriter("src/main/java/com/company/output.yml");
-                    yaml.dump(totalPossibilities, writer);
-                }
-            }
-        }
-
-        // Print the sorted list
-        List<Map.Entry<String, Integer> > list =
-                new LinkedList<>(totalPossibilities.entrySet());
-        list.sort(Map.Entry.comparingByValue());
-        System.out.println(list);
     }
 
     @SuppressWarnings("unchecked")
-    public GameState(GameState parent, String guess, String actual) throws IOException {
+    public GameState(GameState parent, String guess, String actual) {
         this.parent = parent;
         this.lettersMin = (HashMap<Character, Integer>) parent.lettersMin.clone();
         this.lettersMax = (HashMap<Character, Integer>) parent.lettersMax.clone();
@@ -118,9 +74,6 @@ public class GameState {
             }
         }
         recalculatePossibleWords();
-        if (this.possibleWords.size() > 1) {
-            //populateChildren();
-        }
     }
 
     public void recalculatePossibleWords() {
@@ -142,17 +95,17 @@ public class GameState {
         for (int slot = 0; slot < 5; slot++) {
             for (char ch : misplacedLetters.get(slot)) {
                 if (word.charAt(slot) == ch) {
-                    return false;
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
-    @SuppressWarnings("unchecked")
     public void narrowUsingYellowLetters() {
-        HashSet<String> newWords = (HashSet<String>) possibleWords.clone();
-        for (String word : newWords) {
+        System.out.println(misplacedLetters);
+        HashSet<String> newWords = new HashSet<>();
+        for (String word : possibleWords) {
             if (!hasMisplacedLetters(word)) {
                 newWords.add(word);
             }

@@ -3,6 +3,7 @@ package com.company;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.*;
 
 
@@ -10,15 +11,13 @@ public class Main {
     static HashSet<String> validWords = new HashSet<>();
 
     public static void main(String[] args) throws Exception {
-        /*
+
         File file = new File("src/main/java/com/company/validWords.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st = br.readLine();
         st = st.replace("\"", "");
         String[] allWords = st.split(", ");
         validWords.addAll(Arrays.asList(allWords));
-
-         */
 
         GameState ogState = new GameState();
 
@@ -29,14 +28,26 @@ public class Main {
         // this is how to tell the code that there are a maximum of a certain letter in the word
         // this means that there are no r's in the word.
         // ogState.lettersMax.put('r', 0);
+        ogState.lettersMax.put('o', 0);
+        ogState.lettersMax.put('t', 0);
+        ogState.lettersMax.put('e', 0);
+        ogState.lettersMax.put('c', 0);
+        ogState.lettersMax.put('i', 0);
+        ogState.lettersMax.put('n', 0);
 
         // this is how to tell the code that there is a minimum of a certain letter in the word
         // this means that there are at least 1 t's in the word.
         // ogState.lettersMin.put('t', 1);
+        ogState.lettersMin.put('r', 1);
+        ogState.lettersMin.put('a', 1);
 
         // this is how to tell the code that you know that a certain letter doesn't belong in a certain spot
         // this means that f does not belong in the 4th spot.
         // ogState.misplacedLetters.get(3).add('f');
+        ogState.misplacedLetters.get(0).add('r');
+        ogState.misplacedLetters.get(2).add('a');
+        ogState.misplacedLetters.get(3).add('r');
+        ogState.misplacedLetters.get(1).add('a');
 
         // REMEMBER: You want to pick the output with the lowest value.
         // The number is proportional to the number of words you can expect to have left after guessing that word.
@@ -46,13 +57,14 @@ public class Main {
         Map<String, Integer> totalPossibilities;
         Yaml yaml;
         if (ogState.possibleWords.size() == 2315) {
-            InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
+            InputStream inputStream = new FileInputStream("src/main/java/com/company/verboseoutput.yml");
             yaml = new Yaml();
             totalPossibilities = yaml.load(inputStream);
         } else {
             totalPossibilities = new HashMap<>();
         }
 
+        //String[] forceTest = new String[]{"soare"};
         for (String guess : ogState.possibleWords) {
             if (!totalPossibilities.containsKey(guess)) {
                 ArrayList<GameState> wordChildren = new ArrayList<>();
@@ -69,7 +81,7 @@ public class Main {
 
                 if (ogState.possibleWords.size() == 2315) {
                     yaml = new Yaml();
-                    FileWriter writer = new FileWriter("src/main/java/com/company/output.yml");
+                    FileWriter writer = new FileWriter("src/main/java/com/company/verboseoutput.yml");
                     yaml.dump(totalPossibilities, writer);
                 }
             }
@@ -79,7 +91,12 @@ public class Main {
         List<Map.Entry<String, Integer>> list =
                 new LinkedList<>(totalPossibilities.entrySet());
         list.sort(Map.Entry.comparingByValue());
-        System.out.println(list);
+        DecimalFormat df = new DecimalFormat("0.0000");
+        int i = 0;
+        for (Map.Entry<String, Integer> entry : list) {
+            i++;
+            System.out.println(entry.getKey() + " = " + df.format(entry.getValue()/ogState.possibleWords.size()));
+        }
     }
 
 }
