@@ -16,10 +16,6 @@ public class GameState {
         this.greenLetters = new char[5];
         this.lettersMin = new HashMap<>();
         this.lettersMax = new HashMap<>();
-        for (Character ch = 'a'; ch <= 'z'; ch++) {
-            this.lettersMin.put(ch, 0);
-            this.lettersMax.put(ch, 5);
-        }
         this.misplacedLetters = new ArrayList<>(Arrays.asList(
                 new HashSet<>(),
                 new HashSet<>(),
@@ -58,19 +54,23 @@ public class GameState {
         }
         this.possibleWords = (HashSet<String>) parent.possibleWords.clone();
 
-        for (char c = 'a'; c <= 'z'; c++) {
-            if (getOccurrences(c, guess) > getOccurrences(c, actual)) {
+        for (char c : guess.toCharArray()) {
+            int charOccurrencesGuess = getOccurrences(c, guess);
+            int charOccurrencesAnswer = getOccurrences(c, actual);
+            if (charOccurrencesGuess > charOccurrencesAnswer) {
                 this.lettersMin.put(c, getOccurrences(c, actual));
                 this.lettersMax.put(c, getOccurrences(c, actual));
             } else {
                 this.lettersMin.put(c, getOccurrences(c, guess));
             }
         }
+
         for (int i = 0; i < guess.length(); i++) {
-            if (guess.charAt(i) == actual.charAt(i)) {
-                this.greenLetters[i] = guess.charAt(i);
+            char letter = guess.charAt(i);
+            if (letter == actual.charAt(i)) {
+                this.greenLetters[i] = letter;
             } else {
-                this.misplacedLetters.get(i).add(guess.charAt(i));
+                this.misplacedLetters.get(i).add(letter);
             }
         }
         recalculatePossibleWords();
@@ -114,9 +114,15 @@ public class GameState {
     }
 
     public boolean isWordWithinBounds(String word) {
-        for (char ch = 'a'; ch <= 'z'; ch++) {
-            int occurances = getOccurrences(ch, word);
-            if (occurances < lettersMin.get(ch) || occurances > lettersMax.get(ch)) {
+        for (char letter : lettersMin.keySet()) {
+            int occurrences = getOccurrences(letter, word);
+            if (occurrences < lettersMin.get(letter)) {
+                return false;
+            }
+        }
+        for (char letter : lettersMax.keySet()) {
+            int occurrences = getOccurrences(letter, word);
+            if (occurrences > lettersMax.get(letter)) {
                 return false;
             }
         }
