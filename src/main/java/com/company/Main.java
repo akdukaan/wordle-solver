@@ -75,8 +75,13 @@ public class Main {
                 new LinkedList<>(totalPossibilities.entrySet());
         list.sort(Map.Entry.comparingByValue());
         DecimalFormat df = new DecimalFormat("0.0000");
+        int i = 1;
         for (Map.Entry<String, Integer> entry : list) {
-            System.out.println(entry.getKey() + " = " + df.format((0.0 + entry.getValue())/ogState.possibleWords.size()));
+            String star = "";
+            if (ogState.possibleWords.contains(entry.getKey())) {
+                star = "*";
+            }
+            System.out.println(i++ + ". " + entry.getKey() + " = " + df.format((0.0 + entry.getValue())/ogState.possibleWords.size()) + star);
         }
     }
 
