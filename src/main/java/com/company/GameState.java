@@ -4,14 +4,45 @@ import java.io.*;
 import java.util.*;
 
 public class GameState {
+    int MAX_DEPTH = 1;
     GameState parent;
     HashSet<String> possibleWords;
     HashMap<Character, Integer> lettersMin;
     HashMap<Character, Integer> lettersMax;
     char[] greenLetters;
     ArrayList<Set<Character>> misplacedLetters;
+    HashMap<String, ArrayList<GameState>> children;
+    int depth;
+
+    public boolean isSolved() {
+        return greenLetters[0] != 0 && greenLetters[1] != 0 && greenLetters[2] != 0 && greenLetters[3] != 0 && greenLetters[4] != 0;
+    }
+
+    // returns 0 if its already been solved or
+    // 1 + the best of its childrens average scores if it hasnt
+    public double getScore() {
+        if (isSolved()) {
+            return 0;
+        }
+        double bestAverage = possibleWords.size();
+
+        for (String key : children.keySet()) {
+            double averageScore = 0.0;
+            for (GameState child : children.get(key)) {
+                averageScore += child.getScore();
+            }
+            averageScore /= children.get(key).size();
+            if (averageScore < bestAverage) {
+                bestAverage = averageScore;
+            }
+        }
+        return 1 + bestAverage;
+    }
+
 
     public GameState() {
+        this.depth = 0;
+        this.children = new HashMap<>();
         this.parent = null;
         this.greenLetters = new char[5];
         this.lettersMin = new HashMap<>();
@@ -38,6 +69,8 @@ public class GameState {
     @SuppressWarnings("unchecked")
     public GameState(GameState parent, String guess, String actual) {
         this.parent = parent;
+        this.children = new HashMap<>();
+        this.depth = parent.depth + 1;
         this.lettersMin = (HashMap<Character, Integer>) parent.lettersMin.clone();
         this.lettersMax = (HashMap<Character, Integer>) parent.lettersMax.clone();
         this.greenLetters = parent.greenLetters.clone();
@@ -74,6 +107,21 @@ public class GameState {
             }
         }
         recalculatePossibleWords();
+
+        if (depth <= MAX_DEPTH && !isSolved()) {
+            populateChildren();
+        }
+    }
+
+    public void populateChildren() {
+        for (String guess : possibleWords) {
+            ArrayList<GameState> wordsChildren = new ArrayList<>();
+            for (String solution : possibleWords) {
+                GameState child = new GameState(this, guess, solution);
+                wordsChildren.add(child);
+            }
+            children.put(guess, wordsChildren);
+        }
     }
 
     public void recalculatePossibleWords() {

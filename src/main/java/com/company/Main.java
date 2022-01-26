@@ -5,6 +5,8 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 public class Main {
@@ -23,7 +25,7 @@ public class Main {
 
         // this is how to tell the code that a certain letter is in a certain spot
         // replace the 0s with the letter surrounded by apostrophes, so like 'a'
-        ogState.greenLetters = new char[]{0,0,0,0,0};
+        ogState.greenLetters = new char[]{'a',0,0,0,0};
 
         // this is how to tell the code that there are a maximum of a certain letter in the word
         // this means that there are no r's in the word.
@@ -42,46 +44,58 @@ public class Main {
 
         ogState.recalculatePossibleWords();
 
-        Map<String, Integer> totalPossibilities;
+        Map<String, Double> totalPossibilities;
         Yaml yaml = new Yaml();
-        if (ogState.possibleWords.size() == 2315) {
+        if (ogState.possibleWords.size() == 2315 && false) {
             InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
             totalPossibilities = yaml.load(inputStream);
         } else {
             totalPossibilities = new HashMap<>();
         }
 
-        //String[] forceTest = new String[]{"soare"};
-        for (String guess : validWords) {
+        Stream<String> stream1 = StreamSupport.stream(ogState.possibleWords.spliterator(), true);
+        stream1.forEach(guess -> {
+            double totalPoss = 0.0;
+            for (String solution : ogState.possibleWords) {
+                GameState child = new GameState(ogState, guess, solution);
+                totalPoss += child.getScore();
+            }
+            totalPossibilities.put(guess, totalPoss);
+            System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
+        });
+
+
+        for (String guess : ogState.possibleWords) {
             if (!totalPossibilities.containsKey(guess)) {
-                int totalPoss = 0;
+                int counter = 0;
+                double totalPoss = 0;
                 for (String solution : ogState.possibleWords) {
+                    counter++;
+
                     GameState child = new GameState(ogState, guess, solution);
-                    totalPoss += child.possibleWords.size();
+                    System.out.println(counter + ". created child " + solution + " for " + guess + " - " + child.getScore());
+                    totalPoss += child.getScore();
+
                 }
 
                 totalPossibilities.put(guess, totalPoss);
                 System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
 
-                if (ogState.possibleWords.size() == 2315) {
-                    FileWriter writer = new FileWriter("src/main/java/com/company/output.yml");
-                    yaml.dump(totalPossibilities, writer);
-                }
             }
         }
 
         // Print the sorted list
-        List<Map.Entry<String, Integer>> list =
+        List<Map.Entry<String, Double>> list =
                 new LinkedList<>(totalPossibilities.entrySet());
         list.sort(Map.Entry.comparingByValue());
         DecimalFormat df = new DecimalFormat("0.0000");
         int i = 1;
-        for (Map.Entry<String, Integer> entry : list) {
+        for (Map.Entry<String, Double> entry : list) {
             String star = "";
             if (ogState.possibleWords.contains(entry.getKey())) {
                 star = "*";
             }
-            System.out.println(i++ + ". " + entry.getKey() + " = " + df.format((0.0 + entry.getValue())/ogState.possibleWords.size()) + star);
+            System.out.println(i++ + ". " + entry.getKey() + " = " + df.format(entry.getValue()) + star);
         }
         if (ogState.possibleWords.size() < 2315) {
             System.out.println(ogState.possibleWords);
