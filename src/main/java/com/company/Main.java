@@ -11,6 +11,7 @@ import java.util.stream.StreamSupport;
 
 public class Main {
     static HashSet<String> validWords = new HashSet<>();
+    static Yaml yaml = new Yaml();
 
     public static void main(String[] args) throws Exception {
 
@@ -45,7 +46,6 @@ public class Main {
         ogState.recalculatePossibleWords();
 
         Map<String, Integer> totalPossibilities;
-        Yaml yaml = new Yaml();
         if (ogState.possibleWords.size() == 2315) {
             InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
             totalPossibilities = yaml.load(inputStream);
@@ -53,8 +53,7 @@ public class Main {
             totalPossibilities = new HashMap<>();
         }
 
-        //String[] forceTest = new String[]{"soare"};
-        Stream<String> stream1 = StreamSupport.stream(ogState.possibleWords.spliterator(), true);
+        Stream<String> stream1 = ogState.possibleWords.parallelStream();
         stream1.forEach(guess -> {
             if (!totalPossibilities.containsKey(guess)) {
                 int totalPoss = 0;
@@ -67,13 +66,7 @@ public class Main {
                 System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
 
                 if (ogState.possibleWords.size() == 2315) {
-                    FileWriter writer = null;
-                    try {
-                        writer = new FileWriter("src/main/java/com/company/output.yml");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    yaml.dump(totalPossibilities, writer);
+                    dumpToYaml(totalPossibilities);
                 }
             }
         });
@@ -94,6 +87,16 @@ public class Main {
         if (ogState.possibleWords.size() < 2315) {
             System.out.println(ogState.possibleWords);
         }
+    }
+
+    public static void dumpToYaml(Map<String, Integer> map) {
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter("src/main/java/com/company/output.yml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        yaml.dump(map, writer);
     }
 
 }
