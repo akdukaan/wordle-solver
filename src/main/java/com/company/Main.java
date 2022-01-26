@@ -5,6 +5,8 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 public class Main {
@@ -52,7 +54,8 @@ public class Main {
         }
 
         //String[] forceTest = new String[]{"soare"};
-        for (String guess : validWords) {
+        Stream<String> stream1 = StreamSupport.stream(ogState.possibleWords.spliterator(), true);
+        stream1.forEach(guess -> {
             if (!totalPossibilities.containsKey(guess)) {
                 int totalPoss = 0;
                 for (String solution : ogState.possibleWords) {
@@ -64,11 +67,16 @@ public class Main {
                 System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
 
                 if (ogState.possibleWords.size() == 2315) {
-                    FileWriter writer = new FileWriter("src/main/java/com/company/output.yml");
+                    FileWriter writer = null;
+                    try {
+                        writer = new FileWriter("src/main/java/com/company/output.yml");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     yaml.dump(totalPossibilities, writer);
                 }
             }
-        }
+        });
 
         // Print the sorted list
         List<Map.Entry<String, Integer>> list =
