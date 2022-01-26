@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 public class GameState {
-    int MAX_DEPTH = 1;
+    int MAX_DEPTH = 0;
     GameState parent;
     HashSet<String> possibleWords;
     HashMap<Character, Integer> lettersMin;

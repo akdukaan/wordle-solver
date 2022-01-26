@@ -11,6 +11,7 @@ import java.util.stream.StreamSupport;
 
 public class Main {
     static HashSet<String> validWords = new HashSet<>();
+    static Yaml yaml = new Yaml();
 
     public static void main(String[] args) throws Exception {
 
@@ -25,7 +26,7 @@ public class Main {
 
         // this is how to tell the code that a certain letter is in a certain spot
         // replace the 0s with the letter surrounded by apostrophes, so like 'a'
-        ogState.greenLetters = new char[]{'a',0,0,0,0};
+        ogState.greenLetters = new char[]{0,0,0,0,0};
 
         // this is how to tell the code that there are a maximum of a certain letter in the word
         // this means that there are no r's in the word.
@@ -45,8 +46,7 @@ public class Main {
         ogState.recalculatePossibleWords();
 
         Map<String, Double> totalPossibilities;
-        Yaml yaml = new Yaml();
-        if (ogState.possibleWords.size() == 2315 && false) {
+        if (ogState.possibleWords.size() == 2315) {
             InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
             totalPossibilities = yaml.load(inputStream);
         } else {
@@ -55,34 +55,18 @@ public class Main {
 
         Stream<String> stream1 = StreamSupport.stream(ogState.possibleWords.spliterator(), true);
         stream1.forEach(guess -> {
-            double totalPoss = 0.0;
-            for (String solution : ogState.possibleWords) {
-                GameState child = new GameState(ogState, guess, solution);
-                totalPoss += child.getScore();
-            }
-            totalPossibilities.put(guess, totalPoss);
-            System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
-        });
-
-
-        for (String guess : ogState.possibleWords) {
             if (!totalPossibilities.containsKey(guess)) {
-                int counter = 0;
-                double totalPoss = 0;
+                double totalPoss = 0.0;
                 for (String solution : ogState.possibleWords) {
-                    counter++;
-
                     GameState child = new GameState(ogState, guess, solution);
-                    System.out.println(counter + ". created child " + solution + " for " + guess + " - " + child.getScore());
                     totalPoss += child.getScore();
-
                 }
-
                 totalPossibilities.put(guess, totalPoss);
-                System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
 
+                System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
             }
-        }
+        });
+        dumpToYaml(totalPossibilities);
 
         // Print the sorted list
         List<Map.Entry<String, Double>> list =
@@ -95,11 +79,22 @@ public class Main {
             if (ogState.possibleWords.contains(entry.getKey())) {
                 star = "*";
             }
-            System.out.println(i++ + ". " + entry.getKey() + " = " + df.format(entry.getValue()) + star);
+            System.out.println(i++ + ". " + entry.getKey() + " = " +
+                    df.format((entry.getValue() + 0.0)/2315) + star);
         }
         if (ogState.possibleWords.size() < 2315) {
             System.out.println(ogState.possibleWords);
         }
+    }
+
+    public static void dumpToYaml(Map<String, Double> map) {
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter("src/main/java/com/company/output.yml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        yaml.dump(map, writer);
     }
 
 }
