@@ -10,8 +10,11 @@ public class GameState {
     HashMap<Character, Integer> lettersMax;
     char[] greenLetters;
     ArrayList<Set<Character>> misplacedLetters;
+    String solution = null;
+    int tries;
 
     public GameState() {
+        this.tries = 0;
         this.parent = null;
         this.greenLetters = new char[5];
         this.lettersMin = new HashMap<>();
@@ -35,8 +38,11 @@ public class GameState {
         }
     }
 
+
     @SuppressWarnings("unchecked")
     public GameState(GameState parent, String guess, String actual) {
+        this.tries = parent.tries + 1;
+        this.solution = actual;
         this.parent = parent;
         this.lettersMin = (HashMap<Character, Integer>) parent.lettersMin.clone();
         this.lettersMax = (HashMap<Character, Integer>) parent.lettersMax.clone();
@@ -147,5 +153,31 @@ public class GameState {
                 count++;
         }
         return count;
+    }
+
+    public boolean isSolved() {
+        return greenLetters[0] != 0 && greenLetters[1] != 0 && greenLetters[2] != 0 && greenLetters[3] != 0 && greenLetters[4] != 0;
+    }
+
+    public int getRemainingTries() {
+        if (isSolved()) {
+            return 0;
+        }
+        HashMap<String, GameState> list = new HashMap<>();
+        for (String guess : possibleWords) {
+            GameState s = new GameState(this, guess, solution);
+            list.put(guess, s);
+        }
+
+        Map.Entry<String, GameState> min = null;
+        for (Map.Entry<String, GameState> entry : list.entrySet()) {
+            if (min == null || min.getValue().possibleWords.size() > entry.getValue().possibleWords.size()) {
+                min = entry;
+            }
+        }
+        if (min == null) {
+            System.out.println("the word was " + possibleWords.size());
+        }
+        return 1 + min.getValue().getRemainingTries();
     }
 }

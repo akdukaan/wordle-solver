@@ -6,7 +6,6 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 
 public class Main {
@@ -23,6 +22,12 @@ public class Main {
         validWords.addAll(Arrays.asList(allWords));
 
         GameState ogState = new GameState();
+
+        ArrayList<String> words = new ArrayList<>();
+        file = new File("src/main/java/com/company/bestWords.txt");
+        br = new BufferedReader(new FileReader(file));
+        while ((st = br.readLine()) != null)
+            words.add(st);
 
         // this is how to tell the code that a certain letter is in a certain spot
         // replace the 0s with the letter surrounded by apostrophes, so like 'a'
@@ -44,6 +49,23 @@ public class Main {
         // The number is proportional to the number of words you can expect to have left after guessing that word.
 
         ogState.recalculatePossibleWords();
+
+        // starting word, all possible results
+        HashMap<String, Double> avgTries = new HashMap<>();
+        for (String startingWord : words) {
+            int totalTries = 1;
+            for (String solution : ogState.possibleWords) {
+                GameState state = new GameState(ogState, startingWord, solution);
+                if (state.getRemainingTries() + 1 - totalTries == 4) {
+                    System.out.println("good");
+                }
+                totalTries += state.getRemainingTries() + 1;
+                System.out.println(totalTries);
+            }
+            System.out.println(startingWord + " " + (0.0 + totalTries)/ogState.possibleWords.size());
+            avgTries.put(startingWord, (0.0 + totalTries)/ogState.possibleWords.size());
+        }
+        System.out.println(avgTries);
 
         Map<String, Integer> totalPossibilities;
         if (ogState.possibleWords.size() == 2315) {
@@ -72,21 +94,21 @@ public class Main {
         });
 
         // Print the sorted list
-        List<Map.Entry<String, Integer>> list =
-                new LinkedList<>(totalPossibilities.entrySet());
-        list.sort(Map.Entry.comparingByValue());
-        DecimalFormat df = new DecimalFormat("0.0000");
-        int i = 1;
-        for (Map.Entry<String, Integer> entry : list) {
-            String star = "";
-            if (ogState.possibleWords.contains(entry.getKey())) {
-                star = "*";
-            }
-            System.out.println(i++ + ". " + entry.getKey() + " = " + df.format((0.0 + entry.getValue())/ogState.possibleWords.size()) + star);
-        }
-        if (ogState.possibleWords.size() < 2315) {
-            System.out.println(ogState.possibleWords);
-        }
+//        List<Map.Entry<String, Integer>> list =
+//                new LinkedList<>(totalPossibilities.entrySet());
+//        list.sort(Map.Entry.comparingByValue());
+//        DecimalFormat df = new DecimalFormat("0.0000");
+//        int i = 1;
+//        for (Map.Entry<String, Integer> entry : list) {
+//            String star = "";
+//            if (ogState.possibleWords.contains(entry.getKey())) {
+//                star = "*";
+//                System.out.println(entry.getKey());
+//            }
+//        }
+//        if (ogState.possibleWords.size() < 2315) {
+//            System.out.println(ogState.possibleWords);
+//        }
     }
 
     public static void dumpToYaml(Map<String, Integer> map) {

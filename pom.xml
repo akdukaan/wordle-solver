@@ -13,14 +13,13 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>${snakeyaml.version}</version>
+            <version>1.29</version>
         </dependency>
     </dependencies>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
-        <snakeyaml.version>1.21</snakeyaml.version>
     </properties>
 
     <build>

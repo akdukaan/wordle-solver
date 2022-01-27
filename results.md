@@ -1,5 +1,3 @@
-What should be your first wordle guess? Well this list shows you the average number of words you'll be able to narrow it down to after you guess a word. The word of the day for Wordle changes every day among a set of 2315 words, and those words have been marked with an asterisk, so the ones with an asterisk should be valued a little better than the ones without.
-
 1. roate = 60.4246
 2. raise = 61.0009*
 3. raile = 61.3309
