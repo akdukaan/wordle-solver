@@ -22,4 +22,4 @@ While my top two words were consistent with Glaiel’s, he did not post his resu
 
 My algorithm does not consider how similar words in any of the potential states are. For example, if 4 of the 5 letters are the same in all of the remaining possible solutions, then the power of each of our future guesses is low because any guess can only eliminate one possible solution. Future work could be to use a recursive model to thoroughly examine each state to try to avoid situations where we are left with this problem.
 
-If anyone wishes to review my code, make a pull request for optimization, or add additional features such as recursion, [you view my code on my Github](https://github.com/drbot7/wordle-solver).
+I have attempted to make a branch which does this, but going any deeper than the first level makes it take significantly longer. If anyone has a solution to this, please feel free to create a pull request!
