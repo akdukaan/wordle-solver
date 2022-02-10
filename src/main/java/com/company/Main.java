@@ -6,7 +6,6 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 
 public class Main {
@@ -25,7 +24,7 @@ public class Main {
 
         // this is how to tell the code that a certain letter is in a certain spot
         // replace the 0s with the letter surrounded by apostrophes, so like 'a'
-        ogState.greenLetters = new char[]{0,0,0,0,0};
+        ogState.greenLetters = new char[]{0, 0, 0, 0, 0};
 
         // this is how to tell the code that there are a maximum of a certain letter in the word
         // this means that there are no r's in the word.
@@ -44,6 +43,38 @@ public class Main {
 
         ogState.recalculatePossibleWords();
 
+        String firstGuess = "salet";
+        // salet = 3.542980561555076
+        ArrayList<Integer> depths = new ArrayList<>();
+        Stream<String> stream1 = ogState.possibleWords.parallelStream();
+        stream1.forEach(solution -> {
+            int depth = 1;
+            StringBuilder line = new StringBuilder(solution + ": " + firstGuess);
+            if (!firstGuess.equals(solution)) {
+                GameState state = new GameState(ogState, firstGuess, solution);
+                String bestGuess = state.getBestGuess();
+                while (!bestGuess.equals(solution)) {
+                    line.append(" -> ").append(bestGuess);
+                    depth++;
+                    state = new GameState(state, state.getBestGuess(), solution);
+                    bestGuess = state.getBestGuess();
+                }
+                depth++;
+            }
+
+
+            line.append(" -> ").append(solution).append(" | ").append(depth);
+            System.out.println(line);
+            depths.add(depth);
+        });
+        System.out.println(depths);
+        OptionalDouble average = depths
+                .stream()
+                .mapToDouble(a -> a)
+                .average();
+        System.out.println("THE AVERAGE FOR THE WORD IS ");
+        System.out.print(average.isPresent() ? average.getAsDouble() : 0);
+
         Map<String, Integer> totalPossibilities;
         Yaml yaml = new Yaml();
         if (ogState.possibleWords.size() == 2315) {
@@ -52,49 +83,6 @@ public class Main {
         } else {
             totalPossibilities = new HashMap<>();
         }
-
-        //String[] forceTest = new String[]{"soare"};
-        Stream<String> stream1 = StreamSupport.stream(ogState.possibleWords.spliterator(), true);
-        stream1.forEach(guess -> {
-            if (!totalPossibilities.containsKey(guess)) {
-                int totalPoss = 0;
-                for (String solution : ogState.possibleWords) {
-                    GameState child = new GameState(ogState, guess, solution);
-                    totalPoss += child.possibleWords.size();
-                }
-
-                totalPossibilities.put(guess, totalPoss);
-                System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
-
-                if (ogState.possibleWords.size() == 2315) {
-                    FileWriter writer = null;
-                    try {
-                        writer = new FileWriter("src/main/java/com/company/output.yml");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    yaml.dump(totalPossibilities, writer);
-                }
-            }
-        });
-
-        // Print the sorted list
-        List<Map.Entry<String, Integer>> list =
-                new LinkedList<>(totalPossibilities.entrySet());
-        list.sort(Map.Entry.comparingByValue());
-        DecimalFormat df = new DecimalFormat("0.0000");
-        int i = 1;
-        for (Map.Entry<String, Integer> entry : list) {
-            String star = "";
-            if (ogState.possibleWords.contains(entry.getKey())) {
-                star = "*";
-            }
-            System.out.println(i++ + ". " + entry.getKey() + " = " + df.format((0.0 + entry.getValue())/ogState.possibleWords.size()) + star);
-        }
-        if (ogState.possibleWords.size() < 2315) {
-            System.out.println(ogState.possibleWords);
-        }
     }
-
 }
 
