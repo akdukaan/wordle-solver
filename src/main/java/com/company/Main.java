@@ -22,50 +22,45 @@ public class Main {
         String[] allWords = st.split(", ");
         validWords.addAll(Arrays.asList(allWords));
 
-        GameState ogState = new GameState();
+        GameState startState = new GameState();
 
-        // this is how to tell the code that a certain letter is in a certain spot
-        // replace the 0s with the letter surrounded by apostrophes, so like 'a'
-        ogState.greenLetters = new char[]{0,0,0,0,0};
-
-        // this is how to tell the code that there are a maximum of a certain letter in the word
-        // this means that there are no r's in the word.
-        // ogState.lettersMax.put('r', 0);
-
-        // this is how to tell the code that there is a minimum of a certain letter in the word
-        // this means that there are at least 1 t's in the word.
-        // ogState.lettersMin.put('t', 1);
-
-        // this is how to tell the code that you know that a certain letter doesn't belong in a certain spot
-        // this means that f does not belong in the 4th spot.
-        // ogState.misplacedLetters.get(3).add('f');
+        /* This is how to tell it what you've already guessed.
+           b = black
+           y = yellow
+           g = green
+         */
+        //startState = new GameState(startState, "salet", "byyby", 0);
+        //startState = new GameState(startState, "trial", "yybyy", 0);
+        //startState = new GameState(startState, "prime", "bgbby", 0);
+        //startState = new GameState(startState, "users", "bbgyg", 0);
+        //startState = new GameState(startState, "greys", "yggbg", 0);
+        //startState = new GameState(startState, "dying", "gbggb", 0);
 
         // REMEMBER: You want to pick the output with the lowest value.
         // The number is proportional to the number of words you can expect to have left after guessing that word.
 
-        ogState.recalculatePossibleWords();
+        startState.recalculatePossibleWords();
 
         Map<String, Integer> totalPossibilities;
-        if (ogState.possibleWords.size() == 2315) {
+        if (startState.possibleWords.size() == 2315) {
             InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
             totalPossibilities = yaml.load(inputStream);
         } else {
             totalPossibilities = new HashMap<>();
         }
 
-        Stream<String> stream1 = ogState.possibleWords.parallelStream();
+        Stream<String> stream1 = startState.possibleWords.parallelStream();
         stream1.forEach(guess -> {
             if (!totalPossibilities.containsKey(guess)) {
                 int totalPoss = 0;
-                for (String solution : ogState.possibleWords) {
-                    GameState child = new GameState(ogState, guess, solution);
+                for (String solution : startState.possibleWords) {
+                    GameState child = new GameState(startState, guess, solution);
                     totalPoss += child.possibleWords.size();
                 }
 
                 totalPossibilities.put(guess, totalPoss);
-                System.out.println(totalPossibilities.size() + " " + guess + " " + totalPoss / ogState.possibleWords.size());
 
-                if (ogState.possibleWords.size() == 2315) {
+                if (startState.possibleWords.size() == 2315) {
                     dumpToYaml(totalPossibilities);
                 }
             }
@@ -79,13 +74,13 @@ public class Main {
         int i = 1;
         for (Map.Entry<String, Integer> entry : list) {
             String star = "";
-            if (ogState.possibleWords.contains(entry.getKey())) {
+            if (startState.possibleWords.contains(entry.getKey())) {
                 star = "*";
             }
-            System.out.println(i++ + ". " + entry.getKey() + " = " + df.format((0.0 + entry.getValue())/ogState.possibleWords.size()) + star);
+            System.out.println(i++ + ". " + entry.getKey() + " = " + df.format((0.0 + entry.getValue())/startState.possibleWords.size()) + star);
         }
-        if (ogState.possibleWords.size() < 2315) {
-            System.out.println(ogState.possibleWords);
+        if (startState.possibleWords.size() < 2315) {
+            System.out.println(startState.possibleWords);
         }
     }
 

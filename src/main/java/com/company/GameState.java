@@ -35,6 +35,55 @@ public class GameState {
         }
     }
 
+    public GameState(GameState parent, String guess, String output, int round) {
+        this.parent = parent;
+        this.lettersMin = (HashMap<Character, Integer>) parent.lettersMin.clone();
+        this.lettersMax = (HashMap<Character, Integer>) parent.lettersMax.clone();
+        this.greenLetters = parent.greenLetters.clone();
+        this.misplacedLetters = new ArrayList<>(Arrays.asList(
+                new HashSet<>(),
+                new HashSet<>(),
+                new HashSet<>(),
+                new HashSet<>(),
+                new HashSet<>()));
+        for (int i = 0; i < 5; i++) {
+            for (char c : parent.misplacedLetters.get(i)) {
+                misplacedLetters.get(i).add(c);
+            }
+        }
+        this.possibleWords = (HashSet<String>) parent.possibleWords.clone();
+
+        for (int i = 0; i < 5; i++) {
+            if (output.charAt(i) == 'g') {
+                greenLetters[i] = guess.charAt(i);
+            } else if (output.charAt(i) == 'b') {
+                int count = 0;
+                for (int j = 0; j < 5; j++) {
+                    if (guess.charAt(j) == guess.charAt(i)) {
+                        if (output.charAt(j) == 'g' || output.charAt(j) == 'y') {
+                            count++;
+                        }
+                    }
+                }
+                lettersMax.put(guess.charAt(i), count);
+            } else {
+                // they yellow
+                misplacedLetters.get(i).add(guess.charAt(i));
+                // count the times it came up as yellow+green and add this to lettersMin
+                int count = 0;
+                for (int j = 0; j < 5; j++) {
+                    if (guess.charAt(j) == guess.charAt(i)) {
+                        if (output.charAt(j) == 'g' || output.charAt(j) == 'y') {
+                            count++;
+                        }
+                    }
+                }
+                lettersMin.put(guess.charAt(i), count);
+            }
+        }
+
+    }
+
     @SuppressWarnings("unchecked")
     public GameState(GameState parent, String guess, String actual) {
         this.parent = parent;
