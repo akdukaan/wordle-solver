@@ -29,11 +29,10 @@ public class Main {
            y = yellow
            g = green
          */
-        //startState = new GameState(startState, "salet", "byyby", 0);
-        //startState = new GameState(startState, "trial", "yybyy", 0);
-        //startState = new GameState(startState, "prime", "bgbby", 0);
-        //startState = new GameState(startState, "users", "bbgyg", 0);
-        //startState = new GameState(startState, "greys", "yggbg", 0);
+        //startState = new GameState(startState, "salet", "bbbbb", 0);
+        //startState = new GameState(startState, "tower", "bbbyb", 0);
+        //startState = new GameState(startState, "hunch", "bbyyb", 0);
+        //startState = new GameState(startState, "hunky", "bbybb", 0);
         //startState = new GameState(startState, "dying", "gbggb", 0);
 
         // REMEMBER: You want to pick the output with the lowest value.
@@ -50,17 +49,18 @@ public class Main {
         }
 
         Stream<String> stream1 = startState.possibleWords.parallelStream();
+        GameState finalStartState = startState;
         stream1.forEach(guess -> {
             if (!totalPossibilities.containsKey(guess)) {
                 int totalPoss = 0;
-                for (String solution : startState.possibleWords) {
-                    GameState child = new GameState(startState, guess, solution);
+                for (String solution : finalStartState.possibleWords) {
+                    GameState child = new GameState(finalStartState, guess, solution);
                     totalPoss += child.possibleWords.size();
                 }
 
                 totalPossibilities.put(guess, totalPoss);
 
-                if (startState.possibleWords.size() == 2315) {
+                if (finalStartState.possibleWords.size() == 2315) {
                     dumpToYaml(totalPossibilities);
                 }
             }
