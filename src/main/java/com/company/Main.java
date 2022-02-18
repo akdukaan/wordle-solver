@@ -37,7 +37,6 @@ public class Main {
         startState.recalculatePossibleWords();
 
         Map<String, Integer> totalPossibilities;
-        System.out.println(startState.possibleWords.size());
         if (startState.possibleWords.size() == 2309) {
             InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
             totalPossibilities = yaml.load(inputStream);
@@ -45,7 +44,7 @@ public class Main {
             totalPossibilities = new HashMap<>();
         }
 
-        Stream<String> stream1 = startState.possibleWords.parallelStream();
+        Stream<String> stream1 = validWords.parallelStream();
         GameState finalStartState = startState;
         stream1.forEach(guess -> {
             if (!totalPossibilities.containsKey(guess)) {
@@ -56,12 +55,11 @@ public class Main {
                 }
 
                 totalPossibilities.put(guess, totalPoss);
-
-                if (finalStartState.possibleWords.size() == 2309) {
-                    dumpToYaml(totalPossibilities);
-                }
             }
         });
+        if (finalStartState.possibleWords.size() == 2309) {
+            dumpToYaml(totalPossibilities);
+        }
 
         // Print the sorted list
         List<Map.Entry<String, Integer>> list =
