@@ -28,7 +28,7 @@ public class GameState {
             br = new BufferedReader(new FileReader(file));
             String st = br.readLine();
             st = st.replace("\"", "");
-            String[] allWords = st.split(", ");
+            String[] allWords = st.split(",");
             possibleWords = new HashSet<>(Arrays.asList(allWords));
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,7 +114,7 @@ public class GameState {
             }
         }
 
-        for (int i = 0; i < guess.length(); i++) {
+        for (int i = 0; i < 5; i++) {
             char letter = guess.charAt(i);
             if (letter == actual.charAt(i)) {
                 this.greenLetters[i] = letter;

@@ -19,7 +19,7 @@ public class Main {
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st = br.readLine();
         st = st.replace("\"", "");
-        String[] allWords = st.split(", ");
+        String[] allWords = st.split(",");
         validWords.addAll(Arrays.asList(allWords));
 
         GameState startState = new GameState();
@@ -29,11 +29,7 @@ public class Main {
            y = yellow
            g = green
          */
-        //startState = new GameState(startState, "salet", "bbbbb", 0);
-        //startState = new GameState(startState, "tower", "bbbyb", 0);
-        //startState = new GameState(startState, "hunch", "bbyyb", 0);
-        //startState = new GameState(startState, "hunky", "bbybb", 0);
-        //startState = new GameState(startState, "dying", "gbggb", 0);
+        //startState = new GameState(startState, "flute", "bbgbg", 0);
 
         // REMEMBER: You want to pick the output with the lowest value.
         // The number is proportional to the number of words you can expect to have left after guessing that word.
@@ -41,7 +37,8 @@ public class Main {
         startState.recalculatePossibleWords();
 
         Map<String, Integer> totalPossibilities;
-        if (startState.possibleWords.size() == 2315) {
+        System.out.println(startState.possibleWords.size());
+        if (startState.possibleWords.size() == 2309) {
             InputStream inputStream = new FileInputStream("src/main/java/com/company/output.yml");
             totalPossibilities = yaml.load(inputStream);
         } else {
@@ -60,7 +57,7 @@ public class Main {
 
                 totalPossibilities.put(guess, totalPoss);
 
-                if (finalStartState.possibleWords.size() == 2315) {
+                if (finalStartState.possibleWords.size() == 2309) {
                     dumpToYaml(totalPossibilities);
                 }
             }
@@ -79,7 +76,7 @@ public class Main {
             }
             System.out.println(i++ + ". " + entry.getKey() + " = " + df.format((0.0 + entry.getValue())/startState.possibleWords.size()) + star);
         }
-        if (startState.possibleWords.size() < 2315) {
+        if (startState.possibleWords.size() < 2309) {
             System.out.println(startState.possibleWords);
         }
     }
