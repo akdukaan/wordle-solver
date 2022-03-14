@@ -32,7 +32,7 @@ public class Main {
          */
 
 
-//        startState = new GameState(startState, "salet", "ybbbb", 0);
+//        startState = new GameState(startState, "salet", "gbyyg", 0);
 
         // REMEMBER: You want to pick the output with the lowest value.
         // The number is proportional to the number of words you can expect to have left after guessing that word.
@@ -59,7 +59,9 @@ public class Main {
                 }
 
                 totalPossibilities.put(guess, totalPoss);
-                dumpToYaml(totalPossibilities);
+                if (finalStartState.possibleWords.size() == 2309) {
+                    dumpToYaml(totalPossibilities);
+                }
             }
         });
         if (finalStartState.possibleWords.size() == 2309) {
