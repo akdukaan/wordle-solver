@@ -3,6 +3,7 @@ package com.company;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.sql.SQLOutput;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Stream;
@@ -29,7 +30,9 @@ public class Main {
            y = yellow
            g = green
          */
-        //startState = new GameState(startState, "flute", "bbgbg", 0);
+
+
+//        startState = new GameState(startState, "salet", "ybbbb", 0);
 
         // REMEMBER: You want to pick the output with the lowest value.
         // The number is proportional to the number of words you can expect to have left after guessing that word.
@@ -47,6 +50,7 @@ public class Main {
         Stream<String> stream1 = validWords.parallelStream();
         GameState finalStartState = startState;
         stream1.forEach(guess -> {
+            System.out.println(guess + " - ");
             if (!totalPossibilities.containsKey(guess)) {
                 int totalPoss = 0;
                 for (String solution : finalStartState.possibleWords) {
@@ -55,6 +59,7 @@ public class Main {
                 }
 
                 totalPossibilities.put(guess, totalPoss);
+                dumpToYaml(totalPossibilities);
             }
         });
         if (finalStartState.possibleWords.size() == 2309) {
@@ -79,14 +84,19 @@ public class Main {
         }
     }
 
+    // Probably better to make this not async but i'll do that later.
     public static void dumpToYaml(Map<String, Integer> map) {
-        FileWriter writer = null;
         try {
-            writer = new FileWriter("src/main/java/com/company/output.yml");
-        } catch (IOException e) {
-            e.printStackTrace();
+            FileWriter writer = null;
+            try {
+                writer = new FileWriter("src/main/java/com/company/output.yml");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            yaml.dump(map, writer);
+        } catch (ConcurrentModificationException e) {
+            System.out.println("ERROR IGNORED CONCURRENT");
         }
-        yaml.dump(map, writer);
     }
 
 }

@@ -56,29 +56,30 @@ public class GameState {
         for (int i = 0; i < 5; i++) {
             if (output.charAt(i) == 'g') {
                 greenLetters[i] = guess.charAt(i);
-            } else if (output.charAt(i) == 'b') {
-                int count = 0;
-                for (int j = 0; j < 5; j++) {
-                    if (guess.charAt(j) == guess.charAt(i)) {
-                        if (output.charAt(j) == 'g' || output.charAt(j) == 'y') {
-                            count++;
-                        }
-                    }
-                }
-                lettersMax.put(guess.charAt(i), count);
             } else {
-                // they yellow
                 misplacedLetters.get(i).add(guess.charAt(i));
-                // count the times it came up as yellow+green and add this to lettersMin
                 int count = 0;
-                for (int j = 0; j < 5; j++) {
-                    if (guess.charAt(j) == guess.charAt(i)) {
-                        if (output.charAt(j) == 'g' || output.charAt(j) == 'y') {
-                            count++;
+                if (output.charAt(i) == 'b') {
+                    for (int j = 0; j < 5; j++) {
+                        if (guess.charAt(j) == guess.charAt(i)) {
+                            if (output.charAt(j) == 'g' || output.charAt(j) == 'y') {
+                                count++;
+                            }
                         }
                     }
+                    lettersMax.put(guess.charAt(i), count);
+                } else {
+                    // yellow
+                    // count the times it came up as yellow+green and add this to lettersMin
+                    for (int j = 0; j < 5; j++) {
+                        if (guess.charAt(j) == guess.charAt(i)) {
+                            if (output.charAt(j) == 'g' || output.charAt(j) == 'y') {
+                                count++;
+                            }
+                        }
+                    }
+                    lettersMin.put(guess.charAt(i), count);
                 }
-                lettersMin.put(guess.charAt(i), count);
             }
         }
 
